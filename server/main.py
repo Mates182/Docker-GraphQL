@@ -2,6 +2,7 @@ from fastapi import FastAPI
 import strawberry
 from strawberry.asgi import GraphQL
 from typing import List
+from fastapi.middleware.cors import CORSMiddleware
 
 @strawberry.type
 class Movie:
@@ -20,9 +21,18 @@ class Query:
             Movie(title="Fight Club", director="David Fincher"),
         ]
         return movies_data
-    
+
 schema = strawberry.Schema(query=Query)
 app = FastAPI()
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"], 
+    allow_credentials=True,
+    allow_methods=["*"],  
+    allow_headers=["*"], 
+)
 
 @app.get("/")
 def index():
@@ -32,4 +42,4 @@ app.add_route("/graphql", GraphQL(schema, debug=True))
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=80)

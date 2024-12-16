@@ -6,7 +6,7 @@ const output = document.getElementById('output');
 btn.addEventListener('click', (e) => {
     e.preventDefault()
     const query = input.value;
-    fetch('http://172.31.87.227/graphql', {
+    fetch('http://3.95.161.95/graphql', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -30,6 +30,7 @@ btn.addEventListener('click', (e) => {
         }
     })
     .catch(error => {
+        console.log(query)
         output.innerText = 'Error: ' + error.message;
     });
 });
