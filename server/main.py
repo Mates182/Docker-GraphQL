@@ -8,17 +8,18 @@ from fastapi.middleware.cors import CORSMiddleware
 class Movie:
     title: str
     director: str
+    year: int  # Agregado el campo year
 
 @strawberry.type
 class Query:
     @strawberry.field
     def movies(self) -> List[Movie]:
         movies_data = [
-            Movie(title="The Silence of the Lambs", director="Jonathan Demme"),
-            Movie(title="Lady Snowblood", director="Toshiya Fujita"),
-            Movie(title="Pulp Fiction", director="Quentin Tarantino"),
-            Movie(title="Scarface", director="Brian De Palma"),
-            Movie(title="Fight Club", director="David Fincher"),
+            Movie(title="The Silence of the Lambs", director="Jonathan Demme", year=1991),
+            Movie(title="Lady Snowblood", director="Toshiya Fujita", year=1973),
+            Movie(title="Pulp Fiction", director="Quentin Tarantino", year=1994),
+            Movie(title="Scarface", director="Brian De Palma", year=1983),
+            Movie(title="Fight Club", director="David Fincher", year=1999),
         ]
         return movies_data
 
