@@ -16,7 +16,7 @@ RUN python -m venv venv \
 ENV PATH="/app/venv/bin:$PATH"
 
 # Exponer el puerto donde se ejecutará el servicio
-EXPOSE 80
+EXPOSE 27017
 
 # Comando para iniciar la aplicación
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "27017"]
