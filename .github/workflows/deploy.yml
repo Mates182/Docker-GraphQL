@@ -47,7 +47,7 @@ jobs:
               sudo docker stop server-docker-graphql || echo "No existing process found"
               sudo docker rm server-docker-graphql || echo "No existing process found"
               sudo docker pull mates182/server-docker-graphql:latest
-              sudo docker run --network=host -d -p 80:80 --name server-docker-graphql \
+              sudo docker run --network=host -d -p 27017:27017 --name server-docker-graphql \
                 -e MONGO_URI=${{ secrets.MONGO_URI }} \
                 mates182/server-docker-graphql
   
