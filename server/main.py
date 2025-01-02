@@ -1,27 +1,90 @@
+import os
 from fastapi import FastAPI
 import strawberry
 from strawberry.asgi import GraphQL
 from typing import List
 from fastapi.middleware.cors import CORSMiddleware
+from pymongo import MongoClient
+from dotenv import load_dotenv, dotenv_values
+
+load_dotenv()
+
+client = MongoClient(os.getenv("MONGO_URI"))
+db = client["globaltune_products"]
+products_collection = db["products"]
 
 @strawberry.type
-class Movie:
+class Dimensions:
+    length: float
+    width: float
+    height: float
+
+@strawberry.type
+class Product:
+    id: str
     title: str
-    director: str
-    year: int  # Agregado el campo year
+    description: str
+    category: str
+    price: float
+    stock: int
+    tags: List[str]
+    brand: str
+    sku: str
+    weight: float
+    warranty: str
+    thumbnail: str
+    images: List[str]
+
 
 @strawberry.type
 class Query:
     @strawberry.field
-    def movies(self) -> List[Movie]:
-        movies_data = [
-            Movie(title="The Silence of the Lambs", director="Jonathan Demme", year=1991),
-            Movie(title="Lady Snowblood", director="Toshiya Fujita", year=1973),
-            Movie(title="Pulp Fiction", director="Quentin Tarantino", year=1994),
-            Movie(title="Scarface", director="Brian De Palma", year=1983),
-            Movie(title="Fight Club", director="David Fincher", year=1999),
+    def products(self) -> List[Product]:
+        # Fetch products from MongoDB
+        products_data = list(products_collection.find())  # Retrieve all products from the collection
+        
+        # Convert MongoDB documents to Product objects
+        products = [
+            Product(
+                id=str(product["_id"]),
+                title=product["title"],
+                description=product["description"],
+                category=product["category"],
+                price=product["price"],
+                stock=product["stock"],
+                tags=product["tags"],
+                brand=product["brand"],
+                sku=product["sku"],
+                weight=product["weight"],
+                warranty=product["warranty"],
+                thumbnail=product["thumbnail"],
+                images=product["images"]
+            )
+            for product in products_data
         ]
-        return movies_data
+        return products
+    @strawberry.field
+    def product_by_sku(self, sku: str) -> Product:
+        # Query MongoDB for a product with a specific SKU
+        product_data = products_collection.find_one({"sku": sku})  # Find the product by SKU
+        if product_data:
+            # Convert MongoDB document to Product object
+            return Product(
+                id=str(product_data["_id"]),
+                title=product_data["title"],
+                description=product_data["description"],
+                category=product_data["category"],
+                price=product_data["price"],
+                stock=product_data["stock"],
+                tags=product_data["tags"],
+                brand=product_data["brand"],
+                sku=product_data["sku"],
+                weight=product_data["weight"],
+                warranty=product_data["warranty"],
+                thumbnail=product_data["thumbnail"],
+                images=product_data["images"]
+            )
+        return None  # Return None if no product found
 
 schema = strawberry.Schema(query=Query)
 app = FastAPI()
@@ -43,4 +106,4 @@ app.add_route("/graphql", GraphQL(schema, debug=True))
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=80)
+    uvicorn.run(app, host="0.0.0.0", port=27017)
